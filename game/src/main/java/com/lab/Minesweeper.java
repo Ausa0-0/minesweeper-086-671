@@ -2,10 +2,11 @@ package com.lab;
 
 import java.util.Scanner;
 import java.io.InputStream;
+import java.io.IOException;
 
 public class Minesweeper {
     static char SAFE_CELL = '.';
-    static char MINE_CELL = 'X' ;
+    static char MINE_CELL = 'X';
     static int IS_SAFE = 0;
     static int IS_MINE = 1;
     int fieldX, fieldY;
@@ -21,24 +22,63 @@ public class Minesweeper {
         this.fieldX = fieldX;
         this.fieldY = fieldY;
         this.cells = new int[fieldX][fieldY];
-        for (int i=0; i<fieldX; i++) {
-            for (int j=0; j<fieldY; j++) {
+        for (int i = 0; i < fieldX; i++) {
+            for (int j = 0; j < fieldY; j++) {
                 cells[i][j] = IS_SAFE;
             }
         }
     }
 
     void displayField() {
-        // Task 1: Display the mine field to terminal
+        for (int row = 0; row < fieldY; row++) {
+            for (int col = 0; col < fieldX; col++) {
+                if (cells[row][col] == IS_MINE) {
+                    System.out.print(MINE_CELL);
+                } else {
+                    System.out.print(SAFE_CELL);
+                }
+            }
+            System.out.println();
+        }
     }
+
     void setMineCell(int x, int y) {
         cells[x][y] = IS_MINE;
     }
 
     void initFromFile(String mineFieldFile) {
         InputStream is = getClass().getClassLoader().getResourceAsStream(mineFieldFile);
-        
-        // Task 2: Using `java.util.Scanner` to load mine field from the input stream named, `is`
+        if (is == null) {
+            System.out.println("File not found: " + mineFieldFile);
+            return;
+        }
 
+        Scanner scanner = new Scanner(is);
+        fieldX = scanner.nextInt();
+        fieldY = scanner.nextInt();
+
+        cells = new int[fieldY][fieldX];
+
+        scanner.nextLine();
+        for (int row = 0; row < fieldY; row++) {
+            String line = scanner.nextLine();
+            for (int col = 0; col < fieldX; col++) {
+                if (line.charAt(col) == MINE_CELL) {
+                    cells[row][col] = IS_MINE;
+                } else {
+                    cells[row][col] = IS_SAFE;
+                }
+            }
+        }
+
+        scanner.close();
+    }
+
+    void checkMine(int x, int y) {
+        if (cells[y][x] == IS_MINE) {
+            System.out.println("DIE!! YEAH!!! Kung Kung");
+        } else {
+            System.out.println("Safe!! Noi Arrrr");
+        }
     }
 }
